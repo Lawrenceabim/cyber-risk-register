@@ -123,4 +123,59 @@ describe('App', () => {
     expect(searchInput).toHaveFocus()
     expect(clearButton).toBeDisabled()
   })
+
+  it('sorts the complete and filtered register deterministically', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const register = screen.getByRole('region', {
+      name: /^risk register$/i,
+    })
+
+    const sortControl = within(register).getByRole('combobox', {
+      name: /sort by/i,
+    })
+    const statusFilter = within(register).getByRole('combobox', {
+      name: /status/i,
+    })
+
+    const getOrderedRiskIds = () =>
+      within(register)
+        .getAllByRole('rowheader')
+        .map(
+          (rowHeader) =>
+            within(rowHeader).getByText(/^RISK-\d{3}$/).textContent ?? '',
+        )
+
+    await user.selectOptions(sortControl, 'target-date-asc')
+
+    expect(getOrderedRiskIds()).toEqual([
+      'RISK-005',
+      'RISK-004',
+      'RISK-001',
+      'RISK-002',
+      'RISK-003',
+    ])
+    expect(within(register).getByText('5 risks')).toBeInTheDocument()
+
+    await user.selectOptions(statusFilter, 'Open')
+
+    expect(getOrderedRiskIds()).toEqual([
+      'RISK-004',
+      'RISK-001',
+      'RISK-003',
+    ])
+    expect(within(register).getByText('3 risks')).toBeInTheDocument()
+
+    await user.selectOptions(statusFilter, 'all')
+    await user.selectOptions(sortControl, 'title-asc')
+
+    expect(getOrderedRiskIds()).toEqual([
+      'RISK-005',
+      'RISK-004',
+      'RISK-003',
+      'RISK-001',
+      'RISK-002',
+    ])
+  })
 })

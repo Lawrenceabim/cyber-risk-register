@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import './App.css'
 import {
-  RiskFilters,
+  RiskRegisterControls,
   type RiskCategoryFilter,
   type RiskStatusFilter,
-} from './components/RiskFilters'
+} from './components/RiskRegisterControls'
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
+import {
+  sortRisks,
+  type RiskSortOption,
+} from './utils/sortRisks'
 
 const noMatchesEmptyState = {
   title: 'No risks match your filters',
@@ -20,10 +24,12 @@ function App() {
     useState<RiskStatusFilter>('all')
   const [categoryFilter, setCategoryFilter] =
     useState<RiskCategoryFilter>('all')
+  const [sortOption, setSortOption] =
+    useState<RiskSortOption>('score-desc')
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
-  const visibleRisks = seedRisks.filter((risk) => {
+  const filteredRisks = seedRisks.filter((risk) => {
     const matchesSearch =
       normalizedQuery.length === 0 ||
       [
@@ -42,6 +48,8 @@ function App() {
 
     return matchesSearch && matchesStatus && matchesCategory
   })
+
+  const visibleRisks = sortRisks(filteredRisks, sortOption)
 
   const hasActiveFilters =
     normalizedQuery.length > 0 ||
@@ -114,13 +122,15 @@ function App() {
             </p>
           </div>
 
-          <RiskFilters
+          <RiskRegisterControls
             searchQuery={searchQuery}
             statusFilter={statusFilter}
             categoryFilter={categoryFilter}
+            sortOption={sortOption}
             onSearchChange={setSearchQuery}
             onStatusChange={setStatusFilter}
             onCategoryChange={setCategoryFilter}
+            onSortChange={setSortOption}
             onClear={clearFilters}
           />
 

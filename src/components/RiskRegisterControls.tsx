@@ -5,29 +5,37 @@ import {
   type RiskCategory,
   type RiskStatus,
 } from '../types/risk'
+import {
+  riskSortOptions,
+  type RiskSortOption,
+} from '../utils/sortRisks'
 
 export type RiskStatusFilter = RiskStatus | 'all'
 export type RiskCategoryFilter = RiskCategory | 'all'
 
-interface RiskFiltersProps {
+interface RiskRegisterControlsProps {
   searchQuery: string
   statusFilter: RiskStatusFilter
   categoryFilter: RiskCategoryFilter
+  sortOption: RiskSortOption
   onSearchChange: (query: string) => void
   onStatusChange: (status: RiskStatusFilter) => void
   onCategoryChange: (category: RiskCategoryFilter) => void
+  onSortChange: (sortOption: RiskSortOption) => void
   onClear: () => void
 }
 
-export function RiskFilters({
+export function RiskRegisterControls({
   searchQuery,
   statusFilter,
   categoryFilter,
+  sortOption,
   onSearchChange,
   onStatusChange,
   onCategoryChange,
+  onSortChange,
   onClear,
-}: RiskFiltersProps) {
+}: RiskRegisterControlsProps) {
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   const hasActiveFilters =
@@ -44,7 +52,7 @@ export function RiskFilters({
     <div
       className="register-toolbar"
       role="search"
-      aria-label="Filter risk register"
+      aria-label="Filter and sort risk register"
     >
       <div className="risk-search">
         <label className="risk-search__label" htmlFor="risk-search">
@@ -107,6 +115,27 @@ export function RiskFilters({
           {riskCategories.map((category) => (
             <option key={category} value={category}>
               {category}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="risk-filter">
+        <label className="risk-filter__label" htmlFor="risk-sort">
+          Sort by
+        </label>
+
+        <select
+          className="risk-filter__select"
+          id="risk-sort"
+          value={sortOption}
+          onChange={(event) =>
+            onSortChange(event.target.value as RiskSortOption)
+          }
+        >
+          {riskSortOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
             </option>
           ))}
         </select>
