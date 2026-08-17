@@ -1,22 +1,34 @@
-import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import App from './App'
 
 describe('App', () => {
-  it('renders the starter screen and increments the counter', async () => {
-    const user = userEvent.setup()
-
+  it('renders an empty risk register with an accessible overview', () => {
     render(<App />)
 
     expect(
-      screen.getByRole('heading', { name: /get started/i }),
+      screen.getByRole('heading', {
+        level: 1,
+        name: /understand and prioritize cyber risk/i,
+      }),
     ).toBeInTheDocument()
 
-    const counter = screen.getByRole('button', { name: /count is 0/i })
+    const overview = screen.getByRole('region', {
+      name: /risk overview/i,
+    })
 
-    await user.click(counter)
+    expect(within(overview).getByText('Total risks')).toBeInTheDocument()
+    expect(within(overview).getByText('Critical risks')).toBeInTheDocument()
+    expect(within(overview).getAllByText('0')).toHaveLength(4)
 
-    expect(counter).toHaveAccessibleName(/count is 1/i)
+    expect(
+      screen.getByRole('region', {
+        name: /no risks recorded yet/i,
+      }),
+    ).toBeInTheDocument()
+
+    expect(
+      screen.getByRole('link', { name: /skip to main content/i }),
+    ).toHaveAttribute('href', '#main-content')
   })
 })
