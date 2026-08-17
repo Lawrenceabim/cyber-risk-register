@@ -1,34 +1,62 @@
 import { useState } from 'react'
 import './App.css'
+import {
+  RiskFilters,
+  type RiskCategoryFilter,
+  type RiskStatusFilter,
+} from './components/RiskFilters'
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
 
 const noMatchesEmptyState = {
-  title: 'No risks match your search',
-  description:
-    'Try a different risk ID, title, category, owner or status.',
+  title: 'No risks match your filters',
+  description: 'Try adjusting the search term, status or category.',
 }
 
 function App() {
   const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] =
+    useState<RiskStatusFilter>('all')
+  const [categoryFilter, setCategoryFilter] =
+    useState<RiskCategoryFilter>('all')
+
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
-  const visibleRisks = normalizedQuery
-    ? seedRisks.filter((risk) =>
-        [
-          risk.id,
-          risk.title,
-          risk.category,
-          risk.owner,
-          risk.status,
-        ].some((value) => value.toLowerCase().includes(normalizedQuery)),
-      )
-    : seedRisks
+  const visibleRisks = seedRisks.filter((risk) => {
+    const matchesSearch =
+      normalizedQuery.length === 0 ||
+      [
+        risk.id,
+        risk.title,
+        risk.category,
+        risk.owner,
+        risk.status,
+      ].some((value) => value.toLowerCase().includes(normalizedQuery))
+
+    const matchesStatus =
+      statusFilter === 'all' || risk.status === statusFilter
+
+    const matchesCategory =
+      categoryFilter === 'all' || risk.category === categoryFilter
+
+    return matchesSearch && matchesStatus && matchesCategory
+  })
+
+  const hasActiveFilters =
+    normalizedQuery.length > 0 ||
+    statusFilter !== 'all' ||
+    categoryFilter !== 'all'
 
   const riskCountLabel = `${visibleRisks.length} ${
     visibleRisks.length === 1 ? 'risk' : 'risks'
   }`
+
+  function clearFilters() {
+    setSearchQuery('')
+    setStatusFilter('all')
+    setCategoryFilter('all')
+  }
 
   return (
     <div className="app-shell">
@@ -86,36 +114,19 @@ function App() {
             </p>
           </div>
 
-          <div
-            className="register-toolbar"
-            role="search"
-            aria-label="Search risk register"
-          >
-            <div className="risk-search">
-              <label className="risk-search__label" htmlFor="risk-search">
-                Search risks
-              </label>
-
-              <input
-                className="risk-search__input"
-                id="risk-search"
-                type="search"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                aria-describedby="risk-search-hint"
-                placeholder="Search the register"
-                autoComplete="off"
-              />
-
-              <p className="risk-search__hint" id="risk-search-hint">
-                Matches risk ID, title, category, owner or status.
-              </p>
-            </div>
-          </div>
+          <RiskFilters
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            categoryFilter={categoryFilter}
+            onSearchChange={setSearchQuery}
+            onStatusChange={setStatusFilter}
+            onCategoryChange={setCategoryFilter}
+            onClear={clearFilters}
+          />
 
           <RiskTable
             risks={visibleRisks}
-            emptyState={normalizedQuery ? noMatchesEmptyState : undefined}
+            emptyState={hasActiveFilters ? noMatchesEmptyState : undefined}
           />
         </section>
       </main>

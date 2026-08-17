@@ -68,21 +68,59 @@ describe('App', () => {
     ).not.toBeInTheDocument()
 
     await user.clear(searchInput)
-
-    expect(within(register).getByText('5 risks')).toBeInTheDocument()
-
     await user.type(searchInput, 'unrecorded risk')
 
     expect(within(register).getByText('0 risks')).toBeInTheDocument()
     expect(within(register).queryByRole('table')).not.toBeInTheDocument()
 
-    const emptyState = within(register).getByRole('status')
-
     expect(
-      within(emptyState).getByRole('heading', {
+      within(register).getByRole('heading', {
         level: 3,
-        name: /no risks match your search/i,
+        name: /no risks match your filters/i,
       }),
     ).toBeInTheDocument()
+  })
+
+  it('combines filters and clears them while restoring search focus', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const register = screen.getByRole('region', {
+      name: /^risk register$/i,
+    })
+
+    const searchInput = within(register).getByRole('searchbox', {
+      name: /search risks/i,
+    })
+    const statusFilter = within(register).getByRole('combobox', {
+      name: /status/i,
+    })
+    const categoryFilter = within(register).getByRole('combobox', {
+      name: /category/i,
+    })
+    const clearButton = within(register).getByRole('button', {
+      name: /clear filters/i,
+    })
+
+    expect(clearButton).toBeDisabled()
+
+    await user.selectOptions(statusFilter, 'Open')
+
+    expect(within(register).getByText('3 risks')).toBeInTheDocument()
+
+    await user.selectOptions(categoryFilter, 'Access control')
+    await user.type(searchInput, 'MFA')
+
+    expect(within(register).getByText('1 risk')).toBeInTheDocument()
+    expect(clearButton).toBeEnabled()
+
+    await user.click(clearButton)
+
+    expect(searchInput).toHaveValue('')
+    expect(statusFilter).toHaveValue('all')
+    expect(categoryFilter).toHaveValue('all')
+    expect(within(register).getByText('5 risks')).toBeInTheDocument()
+    expect(searchInput).toHaveFocus()
+    expect(clearButton).toBeDisabled()
   })
 })
