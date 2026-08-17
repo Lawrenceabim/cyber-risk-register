@@ -1,8 +1,20 @@
 import type { Risk, RiskSeverity, RiskStatus } from '../types/risk'
 import { calculateRiskScore, getRiskSeverity } from '../types/risk'
 
+interface EmptyStateContent {
+  title: string
+  description: string
+}
+
 interface RiskTableProps {
   risks: readonly Risk[]
+  emptyState?: EmptyStateContent
+}
+
+const defaultEmptyState: EmptyStateContent = {
+  title: 'Start with your highest-priority risk',
+  description:
+    'Risk records will appear here with their severity, owner, status and target date.',
 }
 
 const severityClassNames: Record<RiskSeverity, string> = {
@@ -30,7 +42,10 @@ function formatTargetDate(targetDate: string): string {
   return targetDateFormatter.format(new Date(`${targetDate}T00:00:00Z`))
 }
 
-export function RiskTable({ risks }: RiskTableProps) {
+export function RiskTable({
+  risks,
+  emptyState = defaultEmptyState,
+}: RiskTableProps) {
   if (risks.length === 0) {
     return (
       <div className="empty-state" role="status">
@@ -42,11 +57,8 @@ export function RiskTable({ risks }: RiskTableProps) {
         </span>
 
         <div>
-          <h3>Start with your highest-priority risk</h3>
-          <p>
-            Risk records will appear here with their severity, owner, status
-            and target date.
-          </p>
+          <h3>{emptyState.title}</h3>
+          <p>{emptyState.description}</p>
         </div>
       </div>
     )

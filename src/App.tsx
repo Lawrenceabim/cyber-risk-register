@@ -1,11 +1,33 @@
+import { useState } from 'react'
 import './App.css'
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
 
+const noMatchesEmptyState = {
+  title: 'No risks match your search',
+  description:
+    'Try a different risk ID, title, category, owner or status.',
+}
+
 function App() {
-  const riskCountLabel = `${seedRisks.length} ${
-    seedRisks.length === 1 ? 'risk' : 'risks'
+  const [searchQuery, setSearchQuery] = useState('')
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+
+  const visibleRisks = normalizedQuery
+    ? seedRisks.filter((risk) =>
+        [
+          risk.id,
+          risk.title,
+          risk.category,
+          risk.owner,
+          risk.status,
+        ].some((value) => value.toLowerCase().includes(normalizedQuery)),
+      )
+    : seedRisks
+
+  const riskCountLabel = `${visibleRisks.length} ${
+    visibleRisks.length === 1 ? 'risk' : 'risks'
   }`
 
   return (
@@ -54,10 +76,47 @@ function App() {
               <p className="section-heading__eyebrow">Portfolio</p>
               <h2 id="register-title">Risk register</h2>
             </div>
-            <p className="register-count">{riskCountLabel}</p>
+
+            <p
+              className="register-count"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {riskCountLabel}
+            </p>
           </div>
 
-          <RiskTable risks={seedRisks} />
+          <div
+            className="register-toolbar"
+            role="search"
+            aria-label="Search risk register"
+          >
+            <div className="risk-search">
+              <label className="risk-search__label" htmlFor="risk-search">
+                Search risks
+              </label>
+
+              <input
+                className="risk-search__input"
+                id="risk-search"
+                type="search"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                aria-describedby="risk-search-hint"
+                placeholder="Search the register"
+                autoComplete="off"
+              />
+
+              <p className="risk-search__hint" id="risk-search-hint">
+                Matches risk ID, title, category, owner or status.
+              </p>
+            </div>
+          </div>
+
+          <RiskTable
+            risks={visibleRisks}
+            emptyState={normalizedQuery ? noMatchesEmptyState : undefined}
+          />
         </section>
       </main>
     </div>

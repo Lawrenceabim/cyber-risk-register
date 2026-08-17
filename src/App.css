@@ -524,3 +524,60 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+.register-toolbar {
+  padding: 1rem 1.4rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.risk-search {
+  display: grid;
+  gap: 0.4rem;
+  width: min(100%, 34rem);
+}
+
+.risk-search__label {
+  color: #172554;
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.risk-search__input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.65rem;
+  background: #ffffff;
+  color: #0f172a;
+  font: inherit;
+}
+
+.risk-search__input::placeholder {
+  color: #64748b;
+}
+
+.risk-search__input:focus-visible {
+  border-color: #0f766e;
+  outline: 3px solid rgb(13 148 136 / 20%);
+  outline-offset: 1px;
+}
+
+.risk-search__hint {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.empty-state > div {
+  min-width: 0;
+}
+
+@media (max-width: 620px) {
+  .empty-state > div {
+    width: 100%;
+    max-width: 100%;
+  }
+}
