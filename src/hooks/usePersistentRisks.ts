@@ -4,93 +4,43 @@ import {
   type Dispatch,
   type SetStateAction,
 } from 'react'
-import {
-  riskCategories,
-  riskStatuses,
-  type Risk,
-  type RiskCategory,
-  type RiskLevel,
-  type RiskStatus,
-} from '../types/risk'
+import type { Risk } from '../types/risk'
+import { parseRiskCollection } from '../utils/riskValidation'
 
 export const riskStorageKey = 'cyber-risk-register:risks:v1'
 
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null
+function cloneRisks(risks: readonly Risk[]): Risk[] {
+  return risks.map((risk) => ({ ...risk }))
 }
 
-function isRiskStatus(value: unknown): value is RiskStatus {
-  return (
-    typeof value === 'string' &&
-    (riskStatuses as readonly string[]).includes(value)
-  )
-}
-
-function isRiskCategory(value: unknown): value is RiskCategory {
-  return (
-    typeof value === 'string' &&
-    (riskCategories as readonly string[]).includes(value)
-  )
-}
-
-function isRiskLevel(value: unknown): value is RiskLevel {
-  return (
-    typeof value === 'number' &&
-    Number.isInteger(value) &&
-    value >= 1 &&
-    value <= 5
-  )
-}
-
-function isIsoDate(value: unknown): value is string {
-  return (
-    typeof value === 'string' &&
-    /^\d{4}-\d{2}-\d{2}$/.test(value)
-  )
-}
-
-function isRisk(value: unknown): value is Risk {
-  if (!isRecord(value)) return false
-
-  return (
-    typeof value.id === 'string' &&
-    typeof value.title === 'string' &&
-    typeof value.description === 'string' &&
-    isRiskCategory(value.category) &&
-    isRiskLevel(value.likelihood) &&
-    isRiskLevel(value.impact) &&
-    isRiskStatus(value.status) &&
-    typeof value.owner === 'string' &&
-    isIsoDate(value.targetDate) &&
-    isIsoDate(value.updatedAt)
-  )
-}
-
-function readStoredRisks(initialRisks: readonly Risk[]): Risk[] {
+function readStoredRisks(
+  initialRisks: readonly Risk[],
+): Risk[] {
   if (typeof window === 'undefined') {
-    return [...initialRisks]
+    return cloneRisks(initialRisks)
   }
 
   try {
-    const storedValue = window.localStorage.getItem(riskStorageKey)
+    const storedValue = window.localStorage.getItem(
+      riskStorageKey,
+    )
 
     if (storedValue === null) {
-      return [...initialRisks]
+      return cloneRisks(initialRisks)
     }
 
-    const parsedValue: unknown = JSON.parse(storedValue)
+    const parsedRisks = parseRiskCollection(
+      JSON.parse(storedValue) as unknown,
+    )
 
-    if (
-      Array.isArray(parsedValue) &&
-      parsedValue.every((risk) => isRisk(risk))
-    ) {
-      return parsedValue
+    if (parsedRisks !== null) {
+      return parsedRisks
     }
   } catch {
     // Corrupted or unavailable storage falls back to seed data.
   }
 
-  return [...initialRisks]
+  return cloneRisks(initialRisks)
 }
 
 export function usePersistentRisks(
