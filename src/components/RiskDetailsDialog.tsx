@@ -1,10 +1,24 @@
-import { useEffect, useId, useRef } from 'react'
-import type { Risk } from '../types/risk'
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type FormEvent,
+  type MouseEvent,
+  type RefObject,
+} from 'react'
+import {
+  riskStatuses,
+  type Risk,
+  type RiskStatus,
+} from '../types/risk'
 import { calculateRiskScore, getRiskSeverity } from '../types/risk'
 
 interface RiskDetailsDialogProps {
   risk: Risk
   onClose: () => void
+  onStatusChange?: (status: RiskStatus) => void
+  returnFocusFallbackRef?: RefObject<HTMLElement | null>
 }
 
 const dateFormatter = new Intl.DateTimeFormat('en-GB', {
@@ -21,14 +35,19 @@ function formatDate(date: string): string {
 export function RiskDetailsDialog({
   risk,
   onClose,
+  onStatusChange,
+  returnFocusFallbackRef,
 }: RiskDetailsDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
   const titleId = useId()
   const descriptionId = useId()
+  const statusId = useId()
+  const [draftStatus, setDraftStatus] = useState<RiskStatus>(risk.status)
 
   const score = calculateRiskScore(risk)
   const severity = getRiskSeverity(risk)
+  const hasStatusChange = draftStatus !== risk.status
 
   useEffect(() => {
     const previouslyFocused =
@@ -36,8 +55,12 @@ export function RiskDetailsDialog({
         ? document.activeElement
         : null
 
+    const fallbackFocusTarget =
+      returnFocusFallbackRef?.current ?? null
+
     const previousBodyOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
+
     closeButtonRef.current?.focus()
 
     function handleKeyDown(event: KeyboardEvent) {
@@ -80,17 +103,28 @@ export function RiskDetailsDialog({
 
     return () => {
       document.removeEventListener('keydown', handleKeyDown)
-            document.body.style.overflow = previousBodyOverflow
-      previouslyFocused?.focus()
-    }
-  }, [onClose])
+      document.body.style.overflow = previousBodyOverflow
 
-  function handleBackdropMouseDown(
-    event: React.MouseEvent<HTMLDivElement>,
-  ) {
+      if (previouslyFocused?.isConnected) {
+        previouslyFocused.focus()
+        } else {
+        fallbackFocusTarget?.focus()
+      }
+    }
+  }, [onClose, returnFocusFallbackRef])
+
+  function handleBackdropMouseDown(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
       onClose()
     }
+  }
+
+  function handleStatusSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    if (!hasStatusChange || !onStatusChange) return
+
+    onStatusChange(draftStatus)
   }
 
   return (
@@ -126,6 +160,45 @@ export function RiskDetailsDialog({
         <p className="risk-dialog__description" id={descriptionId}>
           {risk.description}
         </p>
+
+        {onStatusChange ? (
+          <form
+            className="risk-dialog__status-form"
+            onSubmit={handleStatusSubmit}
+          >
+            <div className="risk-dialog__status-field">
+              <label htmlFor={statusId}>Risk status</label>
+
+              <select
+                id={statusId}
+                value={draftStatus}
+                onChange={(event) =>
+                  setDraftStatus(event.target.value as RiskStatus)
+                }
+              >
+                {riskStatuses.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <button type="submit" disabled={!hasStatusChange}>
+              Save status
+            </button>
+
+            <p
+              className="risk-dialog__status-message"
+              aria-live="polite"
+              aria-atomic="true"
+            >
+              {hasStatusChange
+                ? `Status will change from ${risk.status} to ${draftStatus}.`
+                : `Current status: ${risk.status}.`}
+            </p>
+          </form>
+        ) : null}
 
         <dl className="risk-dialog__details">
           <div>

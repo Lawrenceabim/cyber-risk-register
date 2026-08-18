@@ -36,4 +36,71 @@ describe('App risk details', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(opener).toHaveFocus()
   })
+
+  it('updates status, metrics and filtered results immutably', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    const register = screen.getByRole('region', {
+      name: /^risk register$/i,
+    })
+    const overview = screen.getByRole('region', {
+      name: /risk overview/i,
+    })
+    const statusFilter = within(register).getByRole('combobox', {
+      name: /^status$/i,
+    })
+
+    await user.selectOptions(statusFilter, 'Open')
+
+    expect(within(register).getByText('3 risks')).toBeInTheDocument()
+
+    const opener = within(register).getByRole('button', {
+      name: /view details for risk-001/i,
+    })
+
+    await user.click(opener)
+
+    const dialog = screen.getByRole('dialog')
+    const dialogStatus = within(dialog).getByRole('combobox', {
+      name: /risk status/i,
+    })
+    const saveButton = within(dialog).getByRole('button', {
+      name: /save status/i,
+    })
+
+    await user.selectOptions(dialogStatus, 'Mitigated')
+    await user.click(saveButton)
+
+    expect(dialogStatus).toHaveValue('Mitigated')
+    expect(saveButton).toBeDisabled()
+
+    const activeCard = within(overview).getByRole('article', {
+      name: /active risks/i,
+    })
+    const mitigatedCard = within(overview).getByRole('article', {
+      name: /mitigated risks/i,
+    })
+
+    expect(within(activeCard).getByText('3')).toBeInTheDocument()
+    expect(within(mitigatedCard).getByText('2')).toBeInTheDocument()
+    expect(within(register).getByText('2 risks')).toBeInTheDocument()
+    expect(
+      within(register).queryByRole('button', {
+        name: /view details for risk-001/i,
+      }),
+    ).not.toBeInTheDocument()
+
+    await user.click(
+      within(dialog).getByRole('button', { name: /close/i }),
+    )
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(
+      within(register).getByRole('heading', {
+        level: 2,
+        name: /risk register/i,
+      }),
+    ).toHaveFocus()
+  })
 })

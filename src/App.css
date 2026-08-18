@@ -876,3 +876,92 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+#register-title:focus-visible {
+  border-radius: 0.25rem;
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 4px;
+}
+
+.risk-dialog__status-form {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.risk-dialog__status-field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.risk-dialog__status-field label {
+  color: #334155;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.risk-dialog__status-field select {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  color: #0f172a;
+  background: #ffffff;
+  font: inherit;
+}
+
+.risk-dialog__status-field select:focus-visible {
+  border-color: #0f766e;
+  outline: 3px solid rgb(13 148 136 / 20%);
+  outline-offset: 1px;
+}
+
+.risk-dialog__status-form button {
+  min-height: 2.65rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid #0f766e;
+  border-radius: 0.6rem;
+  color: #ffffff;
+  background: #0f766e;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.risk-dialog__status-form button:hover:not(:disabled) {
+  background: #115e59;
+}
+
+.risk-dialog__status-form button:focus-visible {
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 2px;
+}
+
+.risk-dialog__status-form button:disabled {
+  border-color: #cbd5e1;
+  color: #94a3b8;
+  background: #e2e8f0;
+  cursor: not-allowed;
+}
+
+.risk-dialog__status-message {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 620px) {
+  .risk-dialog__status-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .risk-dialog__status-form button {
+    width: 100%;
+  }
+}

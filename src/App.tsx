@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import './App.css'
 import { RiskDetailsDialog } from './components/RiskDetailsDialog'
 import {
@@ -9,7 +9,7 @@ import {
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
-import type { Risk } from './types/risk'
+import type { Risk, RiskStatus } from './types/risk'
 import {
   sortRisks,
   type RiskSortOption,
@@ -21,6 +21,7 @@ const noMatchesEmptyState = {
 }
 
 function App() {
+  const [risks, setRisks] = useState<Risk[]>(() => [...seedRisks])
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] =
     useState<RiskStatusFilter>('all')
@@ -28,11 +29,14 @@ function App() {
     useState<RiskCategoryFilter>('all')
   const [sortOption, setSortOption] =
     useState<RiskSortOption>('score-desc')
-  const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null)
+  const [selectedRiskId, setSelectedRiskId] = useState<string | null>(
+    null,
+  )
+  const registerHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
-  const filteredRisks = seedRisks.filter((risk) => {
+  const filteredRisks = risks.filter((risk) => {
     const matchesSearch =
       normalizedQuery.length === 0 ||
       [
@@ -54,6 +58,11 @@ function App() {
 
   const visibleRisks = sortRisks(filteredRisks, sortOption)
 
+  const selectedRisk =
+    selectedRiskId === null
+      ? null
+      : risks.find((risk) => risk.id === selectedRiskId) ?? null
+
   const hasActiveFilters =
     normalizedQuery.length > 0 ||
     statusFilter !== 'all' ||
@@ -64,12 +73,33 @@ function App() {
   }`
 
   const openRiskDetails = useCallback((risk: Risk) => {
-    setSelectedRisk(risk)
+    setSelectedRiskId(risk.id)
   }, [])
 
   const closeRiskDetails = useCallback(() => {
-    setSelectedRisk(null)
+    setSelectedRiskId(null)
   }, [])
+
+  const updateSelectedRiskStatus = useCallback(
+    (status: RiskStatus) => {
+      if (selectedRiskId === null) return
+
+      const updatedAt = new Date().toISOString().slice(0, 10)
+
+      setRisks((currentRisks) =>
+        currentRisks.map((risk) =>
+          risk.id === selectedRiskId
+            ? {
+                ...risk,
+                status,
+                updatedAt,
+              }
+            : risk,
+        ),
+      )
+    },
+    [selectedRiskId],
+  )
 
   function clearFilters() {
     setSearchQuery('')
@@ -115,13 +145,19 @@ function App() {
           </p>
         </section>
 
-        <RiskSummary risks={seedRisks} />
+        <RiskSummary risks={risks} />
 
         <section className="register-panel" aria-labelledby="register-title">
           <div className="register-panel__header">
             <div>
               <p className="section-heading__eyebrow">Portfolio</p>
-              <h2 id="register-title">Risk register</h2>
+              <h2
+                ref={registerHeadingRef}
+                id="register-title"
+                tabIndex={-1}
+              >
+                Risk register
+              </h2>
             </div>
 
             <p
@@ -157,6 +193,8 @@ function App() {
         <RiskDetailsDialog
           risk={selectedRisk}
           onClose={closeRiskDetails}
+          onStatusChange={updateSelectedRiskStatus}
+          returnFocusFallbackRef={registerHeadingRef}
         />
       ) : null}
     </div>
