@@ -2,6 +2,7 @@ import { useCallback, useRef, useState } from 'react'
 import './App.css'
 import { RiskCreateDialog } from './components/RiskCreateDialog'
 import { RiskDetailsDialog } from './components/RiskDetailsDialog'
+import { RiskExportButton } from './components/RiskExportButton'
 import {
   RiskRegisterControls,
   type RiskCategoryFilter,
@@ -259,7 +260,7 @@ function App() {
               >
                 {riskCountLabel}
               </p>
-
+               <RiskExportButton risks={risks} />
               <button
                 className="add-risk-button"
                 type="button"

@@ -1308,3 +1308,36 @@
   flex-wrap: wrap;
   gap: 0.65rem;
 }
+
+.risk-export-action {
+  display: flex;
+}
+
+.risk-export-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #0f766e;
+  border-radius: 0.75rem;
+  color: #0f766e;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.risk-export-button:hover {
+  background: #f0fdfa;
+}
+
+.risk-export-button:focus-visible {
+  outline: 3px solid #2dd4bf;
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .risk-export-action,
+  .risk-export-button {
+    width: 100%;
+  }
+}
