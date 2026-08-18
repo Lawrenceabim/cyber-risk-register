@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import './App.css'
+import { usePersistentRisks } from './hooks/usePersistentRisks'
 import { RiskDetailsDialog } from './components/RiskDetailsDialog'
 import {
   RiskRegisterControls,
@@ -21,7 +22,7 @@ const noMatchesEmptyState = {
 }
 
 function App() {
-  const [risks, setRisks] = useState<Risk[]>(() => [...seedRisks])
+  const [risks, setRisks] = usePersistentRisks(seedRisks)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] =
     useState<RiskStatusFilter>('all')
