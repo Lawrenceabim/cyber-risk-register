@@ -1300,3 +1300,11 @@
   border-color: #912018;
   background: #912018;
 }
+
+.risk-dialog__header-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}

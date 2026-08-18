@@ -14,7 +14,9 @@ import { usePersistentRisks } from './hooks/usePersistentRisks'
 import type { Risk, RiskStatus } from './types/risk'
 import {
   createRiskFromDraft,
+  riskToDraft,
   type RiskDraft,
+  updateRiskFromDraft,
 } from './utils/riskDraft'
 import {
   sortRisks,
@@ -36,6 +38,9 @@ function App() {
   const [sortOption, setSortOption] =
     useState<RiskSortOption>('score-desc')
   const [selectedRiskId, setSelectedRiskId] = useState<string | null>(
+    null,
+  )
+  const [editingRiskId, setEditingRiskId] = useState<string | null>(
     null,
   )
   const [isCreateDialogOpen, setIsCreateDialogOpen] =
@@ -71,6 +76,11 @@ function App() {
       ? null
       : risks.find((risk) => risk.id === selectedRiskId) ?? null
 
+  const editingRisk =
+    editingRiskId === null
+      ? null
+      : risks.find((risk) => risk.id === editingRiskId) ?? null
+
   const hasActiveFilters =
     normalizedQuery.length > 0 ||
     statusFilter !== 'all' ||
@@ -86,6 +96,17 @@ function App() {
 
   const closeRiskDetails = useCallback(() => {
     setSelectedRiskId(null)
+  }, [])
+
+  const openRiskEditor = useCallback(() => {
+    if (selectedRiskId === null) return
+
+    setEditingRiskId(selectedRiskId)
+    setSelectedRiskId(null)
+  }, [selectedRiskId])
+
+  const closeRiskEditor = useCallback(() => {
+    setEditingRiskId(null)
   }, [])
 
   const openRiskCreator = useCallback(() => {
@@ -111,6 +132,23 @@ function App() {
     [setRisks],
   )
 
+  const saveEditedRisk = useCallback(
+    (draft: RiskDraft) => {
+      if (editingRiskId === null) return
+
+      setRisks((currentRisks) =>
+        currentRisks.map((risk) =>
+          risk.id === editingRiskId
+            ? updateRiskFromDraft(risk, draft)
+            : risk,
+        ),
+      )
+
+      setEditingRiskId(null)
+    },
+    [editingRiskId, setRisks],
+  )
+
   const updateSelectedRiskStatus = useCallback(
     (status: RiskStatus) => {
       if (selectedRiskId === null) return
@@ -132,12 +170,6 @@ function App() {
     [selectedRiskId, setRisks],
   )
 
-  function clearFilters() {
-    setSearchQuery('')
-    setStatusFilter('all')
-    setCategoryFilter('all')
-  }
-
   const deleteSelectedRisk = useCallback(() => {
     if (selectedRiskId === null) return
 
@@ -147,6 +179,12 @@ function App() {
 
     setSelectedRiskId(null)
   }, [selectedRiskId, setRisks])
+
+  function clearFilters() {
+    setSearchQuery('')
+    setStatusFilter('all')
+    setCategoryFilter('all')
+  }
 
   return (
     <div className="app-shell">
@@ -162,7 +200,9 @@ function App() {
             </span>
 
             <span className="brand__copy">
-              <span className="brand__name">Cyber Risk Register</span>
+              <span className="brand__name">
+                Cyber Risk Register
+              </span>
               <span className="brand__tagline">
                 Risk oversight workspace
               </span>
@@ -257,6 +297,7 @@ function App() {
           risk={selectedRisk}
           onClose={closeRiskDetails}
           onStatusChange={updateSelectedRiskStatus}
+          onEdit={openRiskEditor}
           onDelete={deleteSelectedRisk}
           returnFocusFallbackRef={registerHeadingRef}
         />
@@ -266,6 +307,20 @@ function App() {
         <RiskCreateDialog
           onSave={createRisk}
           onClose={closeRiskCreator}
+          returnFocusFallbackRef={registerHeadingRef}
+        />
+      ) : null}
+
+      {editingRisk ? (
+        <RiskCreateDialog
+          key={editingRisk.id}
+          initialDraft={riskToDraft(editingRisk)}
+          eyebrow={editingRisk.id}
+          heading="Edit risk"
+          description="Update this risk record. Its identifier and current status will be preserved."
+          submitLabel="Save changes"
+          onSave={saveEditedRisk}
+          onClose={closeRiskEditor}
           returnFocusFallbackRef={registerHeadingRef}
         />
       ) : null}

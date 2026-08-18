@@ -24,18 +24,28 @@ describe('App risk creation', () => {
       name: /add a risk/i,
     })
 
-    await user.type(
+    fireEvent.change(
       within(dialog).getByRole('textbox', {
         name: /risk title/i,
       }),
-      'Cloud administrator access is over-permissioned',
+      {
+        target: {
+          value:
+            'Cloud administrator access is over-permissioned',
+        },
+      },
     )
 
-    await user.type(
+    fireEvent.change(
       within(dialog).getByRole('textbox', {
         name: /description/i,
       }),
-      'Several cloud administrator roles include unnecessary permissions.',
+      {
+        target: {
+          value:
+            'Several cloud administrator roles include unnecessary permissions.',
+        },
+      },
     )
 
     await user.selectOptions(
@@ -45,11 +55,13 @@ describe('App risk creation', () => {
       'Access control',
     )
 
-    await user.type(
+    fireEvent.change(
       within(dialog).getByRole('textbox', {
         name: /owner/i,
       }),
-      'Cloud security team',
+      {
+        target: { value: 'Cloud security team' },
+      },
     )
 
     await user.selectOptions(

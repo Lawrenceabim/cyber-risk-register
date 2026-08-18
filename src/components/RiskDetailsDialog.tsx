@@ -18,6 +18,7 @@ interface RiskDetailsDialogProps {
   risk: Risk
   onClose: () => void
   onStatusChange?: (status: RiskStatus) => void
+  onEdit?: () => void
   onDelete?: () => void
   returnFocusFallbackRef?: RefObject<HTMLElement | null>
 }
@@ -37,6 +38,7 @@ export function RiskDetailsDialog({
   risk,
   onClose,
   onStatusChange,
+  onEdit,
   onDelete,
   returnFocusFallbackRef,
 }: RiskDetailsDialogProps) {
@@ -170,14 +172,26 @@ export function RiskDetailsDialog({
             <h2 id={titleId}>{risk.title}</h2>
           </div>
 
-          <button
-            ref={closeButtonRef}
-            className="risk-dialog__close"
-            type="button"
-            onClick={onClose}
-          >
-            Close
-          </button>
+          <div className="risk-dialog__header-actions">
+            {onEdit ? (
+              <button
+                className="risk-dialog__close"
+                type="button"
+                onClick={onEdit}
+              >
+                Edit risk
+              </button>
+            ) : null}
+
+            <button
+              ref={closeButtonRef}
+              className="risk-dialog__close"
+              type="button"
+              onClick={onClose}
+            >
+              Close
+            </button>
+          </div>
         </div>
 
         <p className="risk-dialog__description" id={descriptionId}>
