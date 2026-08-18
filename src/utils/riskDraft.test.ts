@@ -3,6 +3,8 @@ import { seedRisks } from '../data/seedRisks'
 import {
   createRiskFromDraft,
   type RiskDraft,
+  riskToDraft,
+  updateRiskFromDraft,
   validateRiskDraft,
 } from './riskDraft'
 
@@ -43,6 +45,20 @@ describe('validateRiskDraft', () => {
       impact: 'Choose an impact from 1 to 5.',
       owner: 'Enter an owner between 2 and 80 characters.',
       targetDate: 'Enter a valid target date.',
+    })
+  })
+})
+
+describe('riskToDraft', () => {
+  it('copies only editable fields from a risk', () => {
+    expect(riskToDraft(seedRisks[0])).toEqual({
+      title: seedRisks[0].title,
+      description: seedRisks[0].description,
+      category: seedRisks[0].category,
+      likelihood: seedRisks[0].likelihood,
+      impact: seedRisks[0].impact,
+      owner: seedRisks[0].owner,
+      targetDate: seedRisks[0].targetDate,
     })
   })
 })
@@ -92,6 +108,43 @@ describe('createRiskFromDraft', () => {
         { ...validDraft, title: '' },
         seedRisks,
       ),
-    ).toThrow('Cannot create a risk from invalid values.')
+    ).toThrow('Cannot save a risk with invalid values.')
+  })
+})
+
+describe('updateRiskFromDraft', () => {
+  it('updates editable fields while preserving identity and status', () => {
+    const originalRisk = { ...seedRisks[0] }
+
+    const updatedRisk = updateRiskFromDraft(
+      originalRisk,
+      validDraft,
+      new Date('2026-08-18T12:00:00.000Z'),
+    )
+
+    expect(updatedRisk).toMatchObject({
+      id: originalRisk.id,
+      status: originalRisk.status,
+      title: validDraft.title,
+      description: validDraft.description,
+      category: validDraft.category,
+      likelihood: validDraft.likelihood,
+      impact: validDraft.impact,
+      owner: validDraft.owner,
+      targetDate: validDraft.targetDate,
+      updatedAt: '2026-08-18',
+    })
+
+    expect(originalRisk).toEqual(seedRisks[0])
+    expect(updatedRisk).not.toBe(originalRisk)
+  })
+
+  it('refuses to update a risk with invalid values', () => {
+    expect(() =>
+      updateRiskFromDraft(seedRisks[0], {
+        ...validDraft,
+        targetDate: 'invalid-date',
+      }),
+    ).toThrow('Cannot save a risk with invalid values.')
   })
 })
