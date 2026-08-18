@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import './App.css'
+import { RiskDetailsDialog } from './components/RiskDetailsDialog'
 import {
   RiskRegisterControls,
   type RiskCategoryFilter,
@@ -8,6 +9,7 @@ import {
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
+import type { Risk } from './types/risk'
 import {
   sortRisks,
   type RiskSortOption,
@@ -26,6 +28,7 @@ function App() {
     useState<RiskCategoryFilter>('all')
   const [sortOption, setSortOption] =
     useState<RiskSortOption>('score-desc')
+  const [selectedRisk, setSelectedRisk] = useState<Risk | null>(null)
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
 
@@ -59,6 +62,14 @@ function App() {
   const riskCountLabel = `${visibleRisks.length} ${
     visibleRisks.length === 1 ? 'risk' : 'risks'
   }`
+
+  const openRiskDetails = useCallback((risk: Risk) => {
+    setSelectedRisk(risk)
+  }, [])
+
+  const closeRiskDetails = useCallback(() => {
+    setSelectedRisk(null)
+  }, [])
 
   function clearFilters() {
     setSearchQuery('')
@@ -137,9 +148,17 @@ function App() {
           <RiskTable
             risks={visibleRisks}
             emptyState={hasActiveFilters ? noMatchesEmptyState : undefined}
+            onViewRisk={openRiskDetails}
           />
         </section>
       </main>
+
+      {selectedRisk ? (
+        <RiskDetailsDialog
+          risk={selectedRisk}
+          onClose={closeRiskDetails}
+        />
+      ) : null}
     </div>
   )
 }

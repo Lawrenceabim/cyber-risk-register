@@ -9,6 +9,7 @@ interface EmptyStateContent {
 interface RiskTableProps {
   risks: readonly Risk[]
   emptyState?: EmptyStateContent
+  onViewRisk?: (risk: Risk) => void
 }
 
 const defaultEmptyState: EmptyStateContent = {
@@ -45,6 +46,7 @@ function formatTargetDate(targetDate: string): string {
 export function RiskTable({
   risks,
   emptyState = defaultEmptyState,
+  onViewRisk,
 }: RiskTableProps) {
   if (risks.length === 0) {
     return (
@@ -83,6 +85,7 @@ export function RiskTable({
             <th scope="col">Owner</th>
             <th scope="col">Status</th>
             <th scope="col">Target date</th>
+            {onViewRisk ? <th scope="col">Actions</th> : null}
           </tr>
         </thead>
 
@@ -127,6 +130,19 @@ export function RiskTable({
                     {formatTargetDate(risk.targetDate)}
                   </time>
                 </td>
+
+                {onViewRisk ? (
+                  <td className="risk-actions">
+                    <button
+                      className="risk-action-button"
+                      type="button"
+                      onClick={() => onViewRisk(risk)}
+                      aria-label={`View details for ${risk.id}: ${risk.title}`}
+                    >
+                      View details
+                    </button>
+                  </td>
+                ) : null}
               </tr>
             )
           })}

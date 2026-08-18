@@ -718,3 +718,161 @@
     margin-top: 0;
   }
 }
+
+.risk-table {
+  min-width: 64rem;
+}
+
+.risk-actions {
+  white-space: nowrap;
+}
+
+.risk-action-button {
+  min-height: 2.35rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #0f766e;
+  border-radius: 0.6rem;
+  color: #0f766e;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.risk-action-button:hover {
+  background: #f0fdfa;
+}
+
+.risk-action-button:focus-visible {
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 2px;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(15 23 42 / 72%);
+}
+
+.risk-dialog {
+  width: min(100%, 46rem);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  border: 1px solid #cbd5e1;
+  border-radius: 1rem;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgb(15 23 42 / 35%);
+}
+
+.risk-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.5rem 1.5rem 1rem;
+}
+
+.risk-dialog__eyebrow {
+  margin: 0 0 0.35rem;
+  color: #0f766e;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.risk-dialog__header h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: clamp(1.35rem, 4vw, 2rem);
+  line-height: 1.2;
+}
+
+.risk-dialog__close {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  color: #334155;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.risk-dialog__close:hover {
+  background: #f8fafc;
+}
+
+.risk-dialog__close:focus-visible {
+  border-color: #0f766e;
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 2px;
+}
+
+.risk-dialog__description {
+  margin: 0;
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #475569;
+  line-height: 1.65;
+}
+
+.risk-dialog__details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1.5rem;
+}
+
+.risk-dialog__details > div {
+  min-width: 0;
+  padding: 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.7rem;
+  background: #f8fafc;
+}
+
+.risk-dialog__details dt {
+  margin-bottom: 0.3rem;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.risk-dialog__details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+@media (max-width: 620px) {
+  .dialog-backdrop {
+    place-items: end center;
+    padding: 0;
+  }
+
+  .risk-dialog {
+    width: 100%;
+    max-height: 92vh;
+    border-radius: 1rem 1rem 0 0;
+  }
+
+  .risk-dialog__header {
+    flex-direction: column;
+  }
+
+  .risk-dialog__close {
+    width: 100%;
+  }
+
+  .risk-dialog__details {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
