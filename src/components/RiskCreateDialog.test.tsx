@@ -4,16 +4,19 @@ import {
   render,
   screen,
   waitFor,
+  within,
 } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
+import { seedRisks } from '../data/seedRisks'
+import { riskToDraft } from '../utils/riskDraft'
 import { RiskCreateDialog } from './RiskCreateDialog'
 
 describe('RiskCreateDialog', () => {
   it('renders accessible risk fields and focuses the title', () => {
     render(
       <RiskCreateDialog
-        onCreate={vi.fn()}
+        onSave={vi.fn()}
         onClose={vi.fn()}
       />,
     )
@@ -41,11 +44,11 @@ describe('RiskCreateDialog', () => {
 
   it('reports invalid fields and focuses the first one', async () => {
     const user = userEvent.setup()
-    const onCreate = vi.fn()
+    const onSave = vi.fn()
 
     render(
       <RiskCreateDialog
-        onCreate={onCreate}
+        onSave={onSave}
         onClose={vi.fn()}
       />,
     )
@@ -60,16 +63,16 @@ describe('RiskCreateDialog', () => {
     expect(
       screen.getByRole('textbox', { name: /risk title/i }),
     ).toHaveFocus()
-    expect(onCreate).not.toHaveBeenCalled()
+    expect(onSave).not.toHaveBeenCalled()
   })
 
   it('submits a complete risk draft', async () => {
     const user = userEvent.setup()
-    const onCreate = vi.fn()
+    const onSave = vi.fn()
 
     render(
       <RiskCreateDialog
-        onCreate={onCreate}
+        onSave={onSave}
         onClose={vi.fn()}
       />,
     )
@@ -104,18 +107,15 @@ describe('RiskCreateDialog', () => {
       '5',
     )
 
-    fireEvent.change(
-      screen.getByLabelText(/target date/i),
-      {
-        target: { value: '2026-11-15' },
-      },
-    )
+    fireEvent.change(screen.getByLabelText(/target date/i), {
+      target: { value: '2026-11-15' },
+    })
 
     await user.click(
       screen.getByRole('button', { name: /create risk/i }),
     )
 
-    expect(onCreate).toHaveBeenCalledWith({
+    expect(onSave).toHaveBeenCalledWith({
       title: 'Cloud administrator access is over-permissioned',
       description:
         'Several cloud administrator roles include unnecessary permissions.',
@@ -141,7 +141,7 @@ describe('RiskCreateDialog', () => {
 
           {isOpen ? (
             <RiskCreateDialog
-              onCreate={vi.fn()}
+              onSave={vi.fn()}
               onClose={() => setIsOpen(false)}
             />
           ) : null}
@@ -165,6 +165,52 @@ describe('RiskCreateDialog', () => {
 
     await waitFor(() => {
       expect(opener).toHaveFocus()
+    })
+  })
+
+  it('supports prefilled values and custom editing copy', async () => {
+    const user = userEvent.setup()
+    const onSave = vi.fn()
+    const initialDraft = riskToDraft(seedRisks[0])
+
+    render(
+      <RiskCreateDialog
+        initialDraft={initialDraft}
+        eyebrow="Existing record"
+        heading="Edit risk"
+        description="Update this risk record."
+        submitLabel="Save changes"
+        onSave={onSave}
+        onClose={vi.fn()}
+      />,
+    )
+
+    const dialog = screen.getByRole('dialog', {
+      name: /edit risk/i,
+    })
+
+    const titleInput = within(dialog).getByRole('textbox', {
+      name: /risk title/i,
+    })
+
+    expect(titleInput).toHaveValue(initialDraft.title)
+
+    await user.clear(titleInput)
+    await user.type(
+      titleInput,
+      'Privileged accounts require stronger authentication',
+    )
+
+    await user.click(
+      within(dialog).getByRole('button', {
+        name: /save changes/i,
+      }),
+    )
+
+    expect(onSave).toHaveBeenCalledWith({
+      ...initialDraft,
+      title:
+        'Privileged accounts require stronger authentication',
     })
   })
 })

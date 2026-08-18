@@ -264,7 +264,7 @@ function App() {
 
       {isCreateDialogOpen ? (
         <RiskCreateDialog
-          onCreate={createRisk}
+          onSave={createRisk}
           onClose={closeRiskCreator}
           returnFocusFallbackRef={registerHeadingRef}
         />

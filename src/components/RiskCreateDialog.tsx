@@ -15,14 +15,19 @@ import {
 } from '../utils/riskDraft'
 
 interface RiskCreateDialogProps {
-  onCreate: (draft: RiskDraft) => void
+  onSave: (draft: RiskDraft) => void
   onClose: () => void
+  initialDraft?: RiskDraft
+  eyebrow?: string
+  heading?: string
+  description?: string
+  submitLabel?: string
   returnFocusFallbackRef?: RefObject<HTMLElement | null>
 }
 
 const riskLevels = [1, 2, 3, 4, 5] as const
 
-const initialDraft: RiskDraft = {
+const emptyRiskDraft: RiskDraft = {
   title: '',
   description: '',
   category: '',
@@ -33,8 +38,13 @@ const initialDraft: RiskDraft = {
 }
 
 export function RiskCreateDialog({
-  onCreate,
+  onSave,
   onClose,
+  initialDraft = emptyRiskDraft,
+  eyebrow = 'New record',
+  heading = 'Add a risk',
+  description = 'Record the risk, its ownership and its treatment target. All fields are required.',
+  submitLabel = 'Create risk',
   returnFocusFallbackRef,
 }: RiskCreateDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
@@ -43,7 +53,9 @@ export function RiskCreateDialog({
   const titleId = useId()
   const descriptionId = useId()
   const formId = useId()
-  const [draft, setDraft] = useState<RiskDraft>(initialDraft)
+  const [draft, setDraft] = useState<RiskDraft>(() => ({
+    ...initialDraft,
+  }))
   const [errors, setErrors] = useState<RiskDraftErrors>({})
 
   useEffect(() => {
@@ -153,7 +165,7 @@ export function RiskCreateDialog({
       return
     }
 
-    onCreate(draft)
+    onSave(draft)
   }
 
   function errorId(field: keyof RiskDraft): string {
@@ -176,8 +188,8 @@ export function RiskCreateDialog({
       >
         <div className="risk-dialog__header">
           <div>
-            <p className="risk-dialog__eyebrow">New record</p>
-            <h2 id={titleId}>Add a risk</h2>
+            <p className="risk-dialog__eyebrow">{eyebrow}</p>
+            <h2 id={titleId}>{heading}</h2>
           </div>
 
           <button
@@ -190,8 +202,7 @@ export function RiskCreateDialog({
         </div>
 
         <p className="risk-dialog__description" id={descriptionId}>
-          Record the risk, its ownership and its treatment target. All
-          fields are required.
+          {description}
         </p>
 
         <form
@@ -202,7 +213,7 @@ export function RiskCreateDialog({
         >
           {Object.keys(errors).length > 0 ? (
             <p className="risk-create-form__alert" role="alert">
-              Review the highlighted fields before creating the risk.
+              Review the highlighted fields before saving the risk.
             </p>
           ) : null}
 
@@ -225,6 +236,7 @@ export function RiskCreateDialog({
                   updateDraft('title', event.target.value)
                 }
               />
+
               {errors.title ? (
                 <p
                   className="risk-create-form__error"
@@ -256,6 +268,7 @@ export function RiskCreateDialog({
                   updateDraft('description', event.target.value)
                 }
               />
+
               {errors.description ? (
                 <p
                   className="risk-create-form__error"
@@ -282,12 +295,14 @@ export function RiskCreateDialog({
                 }
               >
                 <option value="">Choose a category</option>
+
                 {riskCategories.map((category) => (
                   <option key={category} value={category}>
                     {category}
                   </option>
                 ))}
               </select>
+
               {errors.category ? (
                 <p
                   className="risk-create-form__error"
@@ -315,6 +330,7 @@ export function RiskCreateDialog({
                   updateDraft('owner', event.target.value)
                 }
               />
+
               {errors.owner ? (
                 <p
                   className="risk-create-form__error"
@@ -353,6 +369,7 @@ export function RiskCreateDialog({
                   </option>
                 ))}
               </select>
+
               {errors.likelihood ? (
                 <p
                   className="risk-create-form__error"
@@ -384,6 +401,7 @@ export function RiskCreateDialog({
                   </option>
                 ))}
               </select>
+
               {errors.impact ? (
                 <p
                   className="risk-create-form__error"
@@ -414,6 +432,7 @@ export function RiskCreateDialog({
                   updateDraft('targetDate', event.target.value)
                 }
               />
+
               {errors.targetDate ? (
                 <p
                   className="risk-create-form__error"
@@ -429,7 +448,7 @@ export function RiskCreateDialog({
             <button type="button" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit">Create risk</button>
+            <button type="submit">{submitLabel}</button>
           </div>
         </form>
       </div>
