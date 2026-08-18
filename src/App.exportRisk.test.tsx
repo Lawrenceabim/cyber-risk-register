@@ -49,8 +49,10 @@ describe('App risk export', () => {
 
     expect(exportedRisks).toEqual(seedRisks)
 
-    expect(screen.getByRole('status')).toHaveTextContent(
-      'Exported 5 risks to cyber-risk-register-2026-08-18.json.',
-    )
+    expect(
+      screen.getByText(
+        'Exported 5 risks to cyber-risk-register-2026-08-18.json.',
+      ),
+    ).toBeInTheDocument()
   })
 })

@@ -3,6 +3,7 @@ import './App.css'
 import { RiskCreateDialog } from './components/RiskCreateDialog'
 import { RiskDetailsDialog } from './components/RiskDetailsDialog'
 import { RiskExportButton } from './components/RiskExportButton'
+import { RiskImportButton } from './components/RiskImportButton'
 import {
   RiskRegisterControls,
   type RiskCategoryFilter,
@@ -181,6 +182,22 @@ function App() {
     setSelectedRiskId(null)
   }, [selectedRiskId, setRisks])
 
+    const importRisks = useCallback(
+      (importedRisks: Risk[]) => {
+        setRisks(
+          importedRisks.map((risk) => ({ ...risk })),
+        )
+        setSearchQuery('')
+        setStatusFilter('all')
+        setCategoryFilter('all')
+        setSortOption('score-desc')
+        setSelectedRiskId(null)
+        setEditingRiskId(null)
+        setIsCreateDialogOpen(false)
+      },
+      [setRisks],
+    )
+
   function clearFilters() {
     setSearchQuery('')
     setStatusFilter('all')
@@ -261,6 +278,7 @@ function App() {
                 {riskCountLabel}
               </p>
                <RiskExportButton risks={risks} />
+               <RiskImportButton onImport={importRisks} />
               <button
                 className="add-risk-button"
                 type="button"

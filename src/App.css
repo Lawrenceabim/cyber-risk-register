@@ -1341,3 +1341,45 @@
     width: 100%;
   }
 }
+
+.register-panel__actions {
+  flex-wrap: wrap;
+}
+
+.risk-import-action {
+  display: flex;
+}
+
+.risk-import-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #0f766e;
+  border-radius: 0.75rem;
+  color: #0f766e;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.risk-import-button:hover:not(:disabled) {
+  background: #f0fdfa;
+}
+
+.risk-import-button:focus-visible {
+  outline: 3px solid #2dd4bf;
+  outline-offset: 2px;
+}
+
+.risk-import-button:disabled {
+  opacity: 0.65;
+  cursor: progress;
+}
+
+@media (max-width: 620px) {
+  .risk-import-action,
+  .risk-import-button {
+    width: 100%;
+  }
+}
