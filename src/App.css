@@ -1383,3 +1383,37 @@
     width: 100%;
   }
 }
+
+.risk-reset-action {
+  display: flex;
+}
+
+.risk-reset-button {
+  min-height: 2.75rem;
+  padding: 0.65rem 1rem;
+  border: 1px solid #fda29b;
+  border-radius: 0.75rem;
+  color: #b42318;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.risk-reset-button:hover {
+  border-color: #f97066;
+  background: #fef3f2;
+}
+
+.risk-reset-button:focus-visible {
+  outline: 3px solid #f97066;
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .risk-reset-action,
+  .risk-reset-button {
+    width: 100%;
+  }
+}
