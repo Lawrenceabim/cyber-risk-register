@@ -1,4 +1,5 @@
 import {
+  fireEvent,
   render,
   screen,
   waitFor,
@@ -50,24 +51,32 @@ describe('App risk editing', () => {
 
     expect(titleInput).toHaveValue(seedRisks[0].title)
 
-    await user.clear(titleInput)
-    await user.type(
-      titleInput,
-      'Privileged accounts require stronger authentication',
-    )
+    fireEvent.change(titleInput, {
+      target: {
+        value:
+          'Privileged accounts require stronger authentication',
+      },
+    })
 
     const ownerInput = within(editDialog).getByRole('textbox', {
       name: /owner/i,
     })
 
-    await user.clear(ownerInput)
-    await user.type(ownerInput, 'Identity governance team')
+    fireEvent.change(ownerInput, {
+      target: {
+        value: 'Identity governance team',
+      },
+    })
 
-    await user.selectOptions(
+    fireEvent.change(
       within(editDialog).getByRole('combobox', {
         name: /likelihood/i,
       }),
-      '3',
+      {
+        target: {
+          value: '3',
+        },
+      },
     )
 
     await user.click(
@@ -78,7 +87,9 @@ describe('App risk editing', () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByRole('dialog', { name: /edit risk/i }),
+        screen.queryByRole('dialog', {
+          name: /edit risk/i,
+        }),
       ).not.toBeInTheDocument()
     })
 
@@ -93,7 +104,9 @@ describe('App risk editing', () => {
     ).toBeInTheDocument()
 
     expect(
-      within(updatedRow).getByText('Identity governance team'),
+      within(updatedRow).getByText(
+        'Identity governance team',
+      ),
     ).toBeInTheDocument()
 
     expect(
@@ -112,7 +125,9 @@ describe('App risk editing', () => {
       name: /critical risks/i,
     })
 
-    expect(within(criticalCard).getByText('0')).toBeInTheDocument()
+    expect(
+      within(criticalCard).getByText('0'),
+    ).toBeInTheDocument()
 
     await waitFor(() => {
       expect(
