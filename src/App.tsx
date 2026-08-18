@@ -99,7 +99,7 @@ function App() {
         ),
       )
     },
-    [selectedRiskId],
+    [setRisks, selectedRiskId],
   )
 
   function clearFilters() {
