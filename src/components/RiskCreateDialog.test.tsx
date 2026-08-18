@@ -66,8 +66,7 @@ describe('RiskCreateDialog', () => {
     expect(onSave).not.toHaveBeenCalled()
   })
 
-  it('submits a complete risk draft', async () => {
-    const user = userEvent.setup()
+  it('submits a complete risk draft', () => {
     const onSave = vi.fn()
 
     render(
@@ -77,44 +76,83 @@ describe('RiskCreateDialog', () => {
       />,
     )
 
-    await user.type(
-      screen.getByRole('textbox', { name: /risk title/i }),
-      'Cloud administrator access is over-permissioned',
-    )
-
-    await user.type(
-      screen.getByRole('textbox', { name: /description/i }),
-      'Several cloud administrator roles include unnecessary permissions.',
-    )
-
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /category/i }),
-      'Access control',
-    )
-
-    await user.type(
-      screen.getByRole('textbox', { name: /owner/i }),
-      'Cloud security team',
-    )
-
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /likelihood/i }),
-      '4',
-    )
-
-    await user.selectOptions(
-      screen.getByRole('combobox', { name: /impact/i }),
-      '5',
-    )
-
-    fireEvent.change(screen.getByLabelText(/target date/i), {
-      target: { value: '2026-11-15' },
+    const dialog = screen.getByRole('dialog', {
+      name: /add a risk/i,
     })
 
-    await user.click(
-      screen.getByRole('button', { name: /create risk/i }),
+    fireEvent.change(
+      within(dialog).getByRole('textbox', {
+        name: /risk title/i,
+      }),
+      {
+        target: {
+          value: 'Cloud administrator access is over-permissioned',
+        },
+      },
     )
 
+    fireEvent.change(
+      within(dialog).getByRole('textbox', {
+        name: /description/i,
+      }),
+      {
+        target: {
+          value:
+            'Several cloud administrator roles include unnecessary permissions.',
+        },
+      },
+    )
+
+    fireEvent.change(
+      within(dialog).getByRole('combobox', {
+        name: /category/i,
+      }),
+      {
+        target: { value: 'Access control' },
+      },
+    )
+
+    fireEvent.change(
+      within(dialog).getByRole('textbox', {
+        name: /owner/i,
+      }),
+      {
+        target: { value: 'Cloud security team' },
+      },
+    )
+
+    fireEvent.change(
+      within(dialog).getByRole('combobox', {
+        name: /likelihood/i,
+      }),
+      {
+        target: { value: '4' },
+      },
+    )
+
+    fireEvent.change(
+      within(dialog).getByRole('combobox', {
+        name: /impact/i,
+      }),
+      {
+        target: { value: '5' },
+      },
+    )
+
+    fireEvent.change(
+      within(dialog).getByLabelText(/target date/i),
+      {
+        target: { value: '2026-11-15' },
+      },
+    )
+
+    fireEvent.click(
+      within(dialog).getByRole('button', {
+        name: /create risk/i,
+      }),
+    )
+
+    expect(onSave).toHaveBeenCalledTimes(1)
     expect(onSave).toHaveBeenCalledWith({
       title: 'Cloud administrator access is over-permissioned',
       description:
@@ -168,8 +206,7 @@ describe('RiskCreateDialog', () => {
     })
   })
 
-  it('supports prefilled values and custom editing copy', async () => {
-    const user = userEvent.setup()
+  it('supports prefilled values and custom editing copy', () => {
     const onSave = vi.fn()
     const initialDraft = riskToDraft(seedRisks[0])
 
@@ -195,18 +232,20 @@ describe('RiskCreateDialog', () => {
 
     expect(titleInput).toHaveValue(initialDraft.title)
 
-    await user.clear(titleInput)
-    await user.type(
-      titleInput,
-      'Privileged accounts require stronger authentication',
-    )
+    fireEvent.change(titleInput, {
+      target: {
+        value:
+          'Privileged accounts require stronger authentication',
+      },
+    })
 
-    await user.click(
+    fireEvent.click(
       within(dialog).getByRole('button', {
         name: /save changes/i,
       }),
     )
 
+    expect(onSave).toHaveBeenCalledTimes(1)
     expect(onSave).toHaveBeenCalledWith({
       ...initialDraft,
       title:
