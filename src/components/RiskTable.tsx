@@ -1,5 +1,9 @@
 import type { Risk, RiskSeverity, RiskStatus } from '../types/risk'
 import { calculateRiskScore, getRiskSeverity } from '../types/risk'
+import {
+  getRiskTimeline,
+  type RiskTimelineState,
+} from '../utils/riskTimeline'
 
 interface EmptyStateContent {
   title: string
@@ -10,6 +14,7 @@ interface RiskTableProps {
   risks: readonly Risk[]
   emptyState?: EmptyStateContent
   onViewRisk?: (risk: Risk) => void
+  today?: string
 }
 
 const defaultEmptyState: EmptyStateContent = {
@@ -32,6 +37,14 @@ const statusClassNames: Record<RiskStatus, string> = {
   Accepted: 'accepted',
 }
 
+const timelineClassNames: Record<RiskTimelineState, string> = {
+  Completed: 'completed',
+  Accepted: 'accepted',
+  Overdue: 'overdue',
+  'Due soon': 'due-soon',
+  'On track': 'on-track',
+}
+
 const targetDateFormatter = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
   month: 'short',
@@ -43,10 +56,15 @@ function formatTargetDate(targetDate: string): string {
   return targetDateFormatter.format(new Date(`${targetDate}T00:00:00Z`))
 }
 
+function getTodayIsoDate(): string {
+  return new Date().toISOString().slice(0, 10)
+}
+
 export function RiskTable({
   risks,
   emptyState = defaultEmptyState,
   onViewRisk,
+  today = getTodayIsoDate(),
 }: RiskTableProps) {
   if (risks.length === 0) {
     return (
@@ -84,6 +102,7 @@ export function RiskTable({
             <th scope="col">Severity</th>
             <th scope="col">Owner</th>
             <th scope="col">Status</th>
+            <th scope="col">Timeline</th>
             <th scope="col">Target date</th>
             {onViewRisk ? <th scope="col">Actions</th> : null}
           </tr>
@@ -93,6 +112,7 @@ export function RiskTable({
           {risks.map((risk) => {
             const severity = getRiskSeverity(risk)
             const score = calculateRiskScore(risk)
+            const timeline = getRiskTimeline(risk, today)
 
             return (
               <tr key={risk.id}>
@@ -123,6 +143,19 @@ export function RiskTable({
                   >
                     {risk.status}
                   </span>
+                </td>
+
+                <td>
+                  <div className="timeline-cell">
+                    <span
+                      className={`timeline-badge timeline-badge--${timelineClassNames[timeline.state]}`}
+                    >
+                      {timeline.state}
+                    </span>
+                    <span className="timeline-detail">
+                      {timeline.detail}
+                    </span>
+                  </div>
                 </td>
 
                 <td>

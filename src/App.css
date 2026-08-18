@@ -965,3 +965,56 @@
     width: 100%;
   }
 }
+
+.risk-table {
+  min-width: 72rem;
+}
+
+.timeline-cell {
+  display: grid;
+  justify-items: start;
+  gap: 0.35rem;
+  min-width: 7.5rem;
+}
+
+.timeline-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.8rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.timeline-detail {
+  color: #64748b;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
+.timeline-badge--completed {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.timeline-badge--accepted {
+  color: #4338ca;
+  background: #e0e7ff;
+}
+
+.timeline-badge--overdue {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.timeline-badge--due-soon {
+  color: #92400e;
+  background: #fef3c7;
+}
+
+.timeline-badge--on-track {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
