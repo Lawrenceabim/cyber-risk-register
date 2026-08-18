@@ -138,6 +138,16 @@ function App() {
     setCategoryFilter('all')
   }
 
+  const deleteSelectedRisk = useCallback(() => {
+    if (selectedRiskId === null) return
+
+    setRisks((currentRisks) =>
+      currentRisks.filter((risk) => risk.id !== selectedRiskId),
+    )
+
+    setSelectedRiskId(null)
+  }, [selectedRiskId, setRisks])
+
   return (
     <div className="app-shell">
       <a className="skip-link" href="#main-content">
@@ -247,6 +257,7 @@ function App() {
           risk={selectedRisk}
           onClose={closeRiskDetails}
           onStatusChange={updateSelectedRiskStatus}
+          onDelete={deleteSelectedRisk}
           returnFocusFallbackRef={registerHeadingRef}
         />
       ) : null}

@@ -18,6 +18,7 @@ interface RiskDetailsDialogProps {
   risk: Risk
   onClose: () => void
   onStatusChange?: (status: RiskStatus) => void
+  onDelete?: () => void
   returnFocusFallbackRef?: RefObject<HTMLElement | null>
 }
 
@@ -36,14 +37,23 @@ export function RiskDetailsDialog({
   risk,
   onClose,
   onStatusChange,
+  onDelete,
   returnFocusFallbackRef,
 }: RiskDetailsDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const closeButtonRef = useRef<HTMLButtonElement>(null)
+  const deleteButtonRef = useRef<HTMLButtonElement>(null)
+  const keepRiskButtonRef = useRef<HTMLButtonElement>(null)
+  const deleteConfirmationWasOpenRef = useRef(false)
   const titleId = useId()
   const descriptionId = useId()
   const statusId = useId()
-  const [draftStatus, setDraftStatus] = useState<RiskStatus>(risk.status)
+  const deleteTitleId = useId()
+  const [draftStatus, setDraftStatus] = useState<RiskStatus>(
+    risk.status,
+  )
+  const [isConfirmingDelete, setIsConfirmingDelete] =
+    useState(false)
 
   const score = calculateRiskScore(risk)
   const severity = getRiskSeverity(risk)
@@ -107,11 +117,24 @@ export function RiskDetailsDialog({
 
       if (previouslyFocused?.isConnected) {
         previouslyFocused.focus()
-        } else {
+      } else {
         fallbackFocusTarget?.focus()
       }
     }
   }, [onClose, returnFocusFallbackRef])
+
+  useEffect(() => {
+    if (isConfirmingDelete) {
+      deleteConfirmationWasOpenRef.current = true
+      keepRiskButtonRef.current?.focus()
+      return
+    }
+
+    if (deleteConfirmationWasOpenRef.current) {
+      deleteConfirmationWasOpenRef.current = false
+      deleteButtonRef.current?.focus()
+    }
+  }, [isConfirmingDelete])
 
   function handleBackdropMouseDown(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) {
@@ -251,6 +274,60 @@ export function RiskDetailsDialog({
             </dd>
           </div>
         </dl>
+
+        {onDelete ? (
+          <section
+            className="risk-dialog__danger-zone"
+            aria-labelledby={deleteTitleId}
+          >
+            <div>
+              <h3 id={deleteTitleId}>Delete risk</h3>
+              <p>
+                Remove this risk record from the local workspace.
+              </p>
+            </div>
+
+            {isConfirmingDelete ? (
+              <div
+                className="risk-dialog__delete-confirmation"
+                role="alert"
+              >
+                <p>
+                  <strong>Delete {risk.id}?</strong> This action
+                  cannot be undone.
+                </p>
+
+                <div className="risk-dialog__delete-actions">
+                  <button
+                    ref={keepRiskButtonRef}
+                    type="button"
+                    onClick={() => setIsConfirmingDelete(false)}
+                  >
+                    Keep risk
+                  </button>
+
+                  <button
+                    className="risk-dialog__delete-button"
+                    type="button"
+                    aria-label={`Confirm delete ${risk.id}`}
+                    onClick={onDelete}
+                  >
+                    Confirm delete
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                ref={deleteButtonRef}
+                className="risk-dialog__delete-button risk-dialog__delete-button--outline"
+                type="button"
+                onClick={() => setIsConfirmingDelete(true)}
+              >
+                Delete risk
+              </button>
+            )}
+          </section>
+        ) : null}
       </div>
     </div>
   )

@@ -1186,3 +1186,117 @@
     width: 100%;
   }
 }
+
+.risk-dialog__danger-zone {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e4e7ec;
+}
+
+.risk-dialog__danger-zone h3 {
+  margin: 0;
+  color: #912018;
+  font-size: 1rem;
+}
+
+.risk-dialog__danger-zone p {
+  margin: 0.35rem 0 0;
+  color: #667085;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.risk-dialog__delete-confirmation {
+  min-width: min(100%, 19rem);
+  padding: 1rem;
+  border: 1px solid #fda29b;
+  border-radius: 0.75rem;
+  background: #fff4f2;
+}
+
+.risk-dialog__delete-confirmation p {
+  margin: 0;
+  color: #912018;
+}
+
+.risk-dialog__delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.risk-dialog__delete-actions button,
+.risk-dialog__delete-button {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.7rem;
+  background: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.risk-dialog__delete-button {
+  border-color: #b42318;
+  color: #ffffff;
+  background: #b42318;
+}
+
+.risk-dialog__delete-button--outline {
+  color: #b42318;
+  background: #ffffff;
+}
+
+.risk-dialog__delete-actions button:hover,
+.risk-dialog__delete-button:hover {
+  border-color: #912018;
+}
+
+.risk-dialog__delete-button:not(
+    .risk-dialog__delete-button--outline
+  ):hover {
+  background: #912018;
+}
+
+.risk-dialog__delete-actions button:focus-visible,
+.risk-dialog__delete-button:focus-visible {
+  outline: 3px solid #fda29b;
+  outline-offset: 2px;
+}
+
+@media (max-width: 620px) {
+  .risk-dialog__danger-zone {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .risk-dialog__delete-confirmation {
+    width: 100%;
+  }
+
+  .risk-dialog__delete-actions {
+    flex-direction: column;
+  }
+
+  .risk-dialog__delete-actions button,
+  .risk-dialog__delete-button {
+    width: 100%;
+  }
+}
+
+.risk-dialog__delete-actions .risk-dialog__delete-button {
+  border-color: #b42318;
+  color: #ffffff;
+  background: #b42318;
+}
+
+.risk-dialog__delete-actions .risk-dialog__delete-button:hover {
+  border-color: #912018;
+  background: #912018;
+}
