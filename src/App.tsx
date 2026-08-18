@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react'
 import './App.css'
-import { usePersistentRisks } from './hooks/usePersistentRisks'
+import { RiskCreateDialog } from './components/RiskCreateDialog'
 import { RiskDetailsDialog } from './components/RiskDetailsDialog'
 import {
   RiskRegisterControls,
@@ -10,7 +10,12 @@ import {
 import { RiskSummary } from './components/RiskSummary'
 import { RiskTable } from './components/RiskTable'
 import { seedRisks } from './data/seedRisks'
+import { usePersistentRisks } from './hooks/usePersistentRisks'
 import type { Risk, RiskStatus } from './types/risk'
+import {
+  createRiskFromDraft,
+  type RiskDraft,
+} from './utils/riskDraft'
 import {
   sortRisks,
   type RiskSortOption,
@@ -33,6 +38,8 @@ function App() {
   const [selectedRiskId, setSelectedRiskId] = useState<string | null>(
     null,
   )
+  const [isCreateDialogOpen, setIsCreateDialogOpen] =
+    useState(false)
   const registerHeadingRef = useRef<HTMLHeadingElement>(null)
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
@@ -81,6 +88,29 @@ function App() {
     setSelectedRiskId(null)
   }, [])
 
+  const openRiskCreator = useCallback(() => {
+    setIsCreateDialogOpen(true)
+  }, [])
+
+  const closeRiskCreator = useCallback(() => {
+    setIsCreateDialogOpen(false)
+  }, [])
+
+  const createRisk = useCallback(
+    (draft: RiskDraft) => {
+      setRisks((currentRisks) => [
+        ...currentRisks,
+        createRiskFromDraft(draft, currentRisks),
+      ])
+
+      setSearchQuery('')
+      setStatusFilter('all')
+      setCategoryFilter('all')
+      setIsCreateDialogOpen(false)
+    },
+    [setRisks],
+  )
+
   const updateSelectedRiskStatus = useCallback(
     (status: RiskStatus) => {
       if (selectedRiskId === null) return
@@ -99,7 +129,7 @@ function App() {
         ),
       )
     },
-    [setRisks, selectedRiskId],
+    [selectedRiskId, setRisks],
   )
 
   function clearFilters() {
@@ -123,12 +153,17 @@ function App() {
 
             <span className="brand__copy">
               <span className="brand__name">Cyber Risk Register</span>
-              <span className="brand__tagline">Risk oversight workspace</span>
+              <span className="brand__tagline">
+                Risk oversight workspace
+              </span>
             </span>
           </div>
 
           <span className="workspace-badge">
-            <span className="workspace-badge__dot" aria-hidden="true" />
+            <span
+              className="workspace-badge__dot"
+              aria-hidden="true"
+            />
             Local workspace
           </span>
         </div>
@@ -139,16 +174,21 @@ function App() {
           <p className="page-intro__eyebrow">
             Governance, risk and compliance
           </p>
-          <h1 id="page-title">Understand and prioritize cyber risk</h1>
+          <h1 id="page-title">
+            Understand and prioritize cyber risk
+          </h1>
           <p className="page-intro__description">
-            Maintain a clear view of security risks, ownership and treatment
-            progress in one focused workspace.
+            Maintain a clear view of security risks, ownership and
+            treatment progress in one focused workspace.
           </p>
         </section>
 
         <RiskSummary risks={risks} />
 
-        <section className="register-panel" aria-labelledby="register-title">
+        <section
+          className="register-panel"
+          aria-labelledby="register-title"
+        >
           <div className="register-panel__header">
             <div>
               <p className="section-heading__eyebrow">Portfolio</p>
@@ -161,13 +201,23 @@ function App() {
               </h2>
             </div>
 
-            <p
-              className="register-count"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {riskCountLabel}
-            </p>
+            <div className="register-panel__actions">
+              <p
+                className="register-count"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {riskCountLabel}
+              </p>
+
+              <button
+                className="add-risk-button"
+                type="button"
+                onClick={openRiskCreator}
+              >
+                Add risk
+              </button>
+            </div>
           </div>
 
           <RiskRegisterControls
@@ -184,7 +234,9 @@ function App() {
 
           <RiskTable
             risks={visibleRisks}
-            emptyState={hasActiveFilters ? noMatchesEmptyState : undefined}
+            emptyState={
+              hasActiveFilters ? noMatchesEmptyState : undefined
+            }
             onViewRisk={openRiskDetails}
           />
         </section>
@@ -195,6 +247,14 @@ function App() {
           risk={selectedRisk}
           onClose={closeRiskDetails}
           onStatusChange={updateSelectedRiskStatus}
+          returnFocusFallbackRef={registerHeadingRef}
+        />
+      ) : null}
+
+      {isCreateDialogOpen ? (
+        <RiskCreateDialog
+          onCreate={createRisk}
+          onClose={closeRiskCreator}
           returnFocusFallbackRef={registerHeadingRef}
         />
       ) : null}
