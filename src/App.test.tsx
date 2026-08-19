@@ -33,6 +33,15 @@ describe('App', () => {
     expect(
       screen.getByRole('link', { name: /skip to main content/i }),
     ).toHaveAttribute('href', '#main-content')
+
+    const footer = screen.getByRole('contentinfo')
+
+    expect(footer).toHaveTextContent(
+      /© 2026 Bimbo Lawrence Damitan/i,
+    )
+    expect(
+      within(footer).getByRole('link', { name: /lawrenceabim/i }),
+    ).toHaveAttribute('href', 'https://lawrenceabim.com')
   })
 
   it('filters the register and reports when no risks match', async () => {

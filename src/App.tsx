@@ -331,6 +331,20 @@ function App() {
         </section>
       </main>
 
+      <footer className="app-footer">
+        <p>
+          © 2026 Bimbo Lawrence Damitan · Built by{' '}
+          <a
+            href="https://lawrenceabim.com"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Lawrenceabim
+          </a>{' '}
+          · All rights reserved.
+        </p>
+      </footer>
+
       {selectedRisk ? (
         <RiskDetailsDialog
           risk={selectedRisk}

@@ -104,6 +104,37 @@
   gap: 2rem;
 }
 
+.app-footer {
+  width: min(100% - 2rem, 1180px);
+  margin-inline: auto;
+  padding-bottom: 2rem;
+  color: #667085;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.app-footer p {
+  margin: 0;
+}
+
+.app-footer a {
+  color: #0f766e;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.app-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.app-footer a:focus-visible {
+  border-radius: 0.2rem;
+  outline: 3px solid rgb(13 148 136 / 25%);
+  outline-offset: 3px;
+}
+
 .page-intro {
   position: relative;
   overflow: hidden;
@@ -1048,13 +1079,14 @@
 }
 
 .risk-create-dialog {
-  width: min(58rem, calc(100% - 2rem));;
+  width: min(58rem, calc(100% - 2rem));
   max-height: calc(100vh - 2rem);
   overflow-y: auto;
 }
 
 .risk-create-form {
   margin-top: 1.5rem;
+  padding: 0 clamp(1rem, 4vw, 1.5rem) 1.5rem;
 }
 
 .risk-create-form__alert {
@@ -1192,8 +1224,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  padding: 1.5rem clamp(1rem, 4vw, 1.5rem);
   border-top: 1px solid #e4e7ec;
 }
 
