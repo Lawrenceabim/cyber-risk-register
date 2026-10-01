@@ -2,6 +2,8 @@
 
 A browser-based cybersecurity governance, risk, and compliance application built with React and TypeScript.
 
+🔗 **Live Demo:** https://cyber-risk-register.vercel.app/
+
 The application helps security and risk teams document cybersecurity risks, calculate their severity, assign ownership, monitor treatment deadlines, and maintain a portable local register.
 
 > This is a portfolio and demonstration application. It supports cybersecurity risk management but does not scan systems, detect attacks, or replace a formal enterprise GRC platform.
@@ -246,6 +248,8 @@ npm run preview
 
 ## Quality checks
 
+The project includes **80 automated tests** covering core workflows, validation, accessibility, persistence, import/export, and risk-management behavior.
+
 Run the automated test suite:
 
 ```bash
@@ -310,3 +314,11 @@ It does not currently provide:
 - Encryption of browser storage
 
 Those capabilities would require a trusted backend and a wider production-security design.
+
+## Author
+
+**Bimbo Lawrence Damitan**  
+Applied Cybersecurity MSc candidate at SRH Berlin
+
+- Portfolio: https://lawrenceabim.com/
+- LinkedIn: https://www.linkedin.com/in/bimbo-lawrence/
