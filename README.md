@@ -194,7 +194,7 @@ Clearing browser storage removes locally persisted changes unless they were expo
 - ESLint
 - CSS
 
-The project uses a single npm lockfile and is designed for Node.js 20 with npm 10.
+The project uses a single npm lockfile and is designed for Node.js 24 with npm 10.
 
 ## Getting started
 
@@ -202,7 +202,7 @@ The project uses a single npm lockfile and is designed for Node.js 20 with npm 1
 
 Install:
 
-- Node.js 20
+- Node.js 24
 - npm 10
 - Git
 
